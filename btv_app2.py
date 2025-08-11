@@ -1,7 +1,7 @@
 import streamlit as st
 import requests, json, re
 
-AI_SERVICE_URL = "https://hook.eu2.make.com/ts619wwnd6jdkhggp968eawcwh2tlocf"
+AI_SERVICE_URL = "https://hook.eu2.make.com/wo7ggj9ex4ppxnv3l24m8jtlw0syd7a1"
 
 st.set_page_config(layout="centered", page_title="배너 문구 자동 생성기")
 st.title("🎬 영화 배너 문구 자동 생성기")
@@ -207,5 +207,6 @@ if generate_button:
                 st.error(f"서버 오류: {e}")
             except Exception as e:
                 st.error(f"예상치 못한 오류가 발생했습니다: {e}")
+
 
 
