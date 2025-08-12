@@ -151,17 +151,27 @@ if generate_button:
                     # 서버가 문자열로 줄 수도 있으니 원문 보관
                     result = resp.text
 
-                # ✅ 여기만 바뀜: render 블록 기준으로 추출
+                # ✅ 여기만 바뀜: render 블록 기준으로 추출 -- 소구포인트 추출 추가 
+                points_text = extract_render_field(result, "c_points_cell")
                 big_text  = extract_render_field(result, "d_big_cell")
                 long_text = extract_render_field(result, "e_long_cell")
                 two_text  = extract_render_field(result, "f_two_col_cell")
 
                 # 한 칸 = 한 세트
+                points_sets = split_sets_smart(points_text)
                 big_sets  = split_sets_smart(big_text)
                 long_sets = split_sets_smart(long_text)
                 two_sets  = split_sets_smart(two_text)
 
                 st.header("2. 생성된 배너 문구")
+                with st.expander("소구포인트", expanded=True):
+                    if not points_sets:
+                        st.info("소구포인트가 없습니다.")
+                    else:
+                        for i, block in enumerate(points_sets, 1):
+                            st.markdown(f"**포인트 {i}**")
+                            st.text_area(f"point_{i}", block, height=120, key=f"out_point_{i}", label_visibility="collapsed")
+                            
                 tab1, tab2, tab3 = st.tabs(["빅배너", "롱배너", "2단 배너"])
 
                 with tab1:
@@ -207,6 +217,7 @@ if generate_button:
                 st.error(f"서버 오류: {e}")
             except Exception as e:
                 st.error(f"예상치 못한 오류가 발생했습니다: {e}")
+
 
 
 
