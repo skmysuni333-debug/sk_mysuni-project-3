@@ -85,7 +85,33 @@ def split_sets_smart(text: str):
 
     # 못 나누면 전체를 한 세트로
     return [s]
-
+# -------------------------------
+# ✅ 블록에서 '소구포인트' 라벨을 제목으로 추출
+# -------------------------------
+def set_title_from_block(block: str) -> str:
+    """
+    세트 블록 안의 라벨을 제목으로 사용.
+    지원 패턴:
+      - '소구포인트: 값'
+      - '- 소구포인트: 값'
+      - '[선정 소구포인트]: 값'
+    """
+    if not block:
+        return ""
+    s = block.replace("\r\n", "\n").replace("\r", "\n")
+    patterns = [
+        r'(?im)^\s*\[\s*선정\s*소구포인트\s*\]\s*:\s*(.+?)\s*$',
+        r'(?im)^\s*-\s*소구포인트\s*:\s*(.+?)\s*$',
+        r'(?im)^\s*소구포인트\s*:\s*(.+?)\s*$',
+    ]
+    for pat in patterns:
+        m = re.search(pat, s, flags=re.MULTILINE)
+        if m:
+            title = m.group(1).strip()
+            # 맨 끝 괄호 부연(예: (23자)) 제거
+            title = re.sub(r'\s*\([^)]*\)\s*$', '', title).strip()
+            return title
+    return ""
 # -------------------------------
 # ✅ Webhook 응답에서 필드 안전 추출
 # -------------------------------
@@ -151,7 +177,7 @@ if generate_button:
                     # 서버가 문자열로 줄 수도 있으니 원문 보관
                     result = resp.text
 
-                # ✅ 여기만 바뀜: render 블록 기준으로 추출 -- 소구포인트 추출 추가 
+                  # ✅ 소구포인트 + 배너문구 추출
                 points_text = extract_render_field(result, "c_points_cell")
                 big_text  = extract_render_field(result, "d_big_cell")
                 long_text = extract_render_field(result, "e_long_cell")
@@ -169,7 +195,7 @@ if generate_button:
                         st.info("소구포인트가 없습니다.")
                     else:
                         st.markdown(points_sets[0])
-                            
+
                 tab1, tab2, tab3 = st.tabs(["빅배너", "롱배너", "2단 배너"])
 
                 with tab1:
@@ -177,7 +203,8 @@ if generate_button:
                         st.info("빅배너 문구가 없습니다.")
                     else:
                         for i, block in enumerate(big_sets, 1):
-                            st.subheader(f"세트 {i}")
+                            title = set_title_from_block(block) or f"세트 {i}"
+                            st.subheader(title)
                             st.text_area(
                                 f"big_set_{i}", block, height=160,
                                 key=f"out_big_{i}", label_visibility="collapsed"
@@ -188,7 +215,8 @@ if generate_button:
                         st.info("롱배너 문구가 없습니다.")
                     else:
                         for i, block in enumerate(long_sets, 1):
-                            st.subheader(f"세트 {i}")
+                            title = set_title_from_block(block) or f"세트 {i}"
+                            st.subheader(title)
                             st.text_area(
                                 f"long_set_{i}", block, height=160,
                                 key=f"out_long_{i}", label_visibility="collapsed"
@@ -199,7 +227,8 @@ if generate_button:
                         st.info("2단 배너 문구가 없습니다.")
                     else:
                         for i, block in enumerate(two_sets, 1):
-                            st.subheader(f"세트 {i}")
+                            title = set_title_from_block(block) or f"세트 {i}"
+                            st.subheader(title)
                             st.text_area(
                                 f"two_set_{i}", block, height=160,
                                 key=f"out_two_{i}", label_visibility="collapsed"
@@ -215,6 +244,7 @@ if generate_button:
                 st.error(f"서버 오류: {e}")
             except Exception as e:
                 st.error(f"예상치 못한 오류가 발생했습니다: {e}")
+
 
 
 
