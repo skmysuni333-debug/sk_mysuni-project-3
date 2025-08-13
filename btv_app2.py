@@ -194,7 +194,7 @@ if generate_button:
                     if not points_sets:
                         st.info("소구포인트가 없습니다.")
                     else:
-                        st.markdown(points_sets[0])
+                        st.markdown("\n---\n".join(points_sets))
 
                 tab1, tab2, tab3 = st.tabs(["빅배너", "롱배너", "2단 배너"])
 
@@ -244,6 +244,7 @@ if generate_button:
                 st.error(f"서버 오류: {e}")
             except Exception as e:
                 st.error(f"예상치 못한 오류가 발생했습니다: {e}")
+
 
 
 
